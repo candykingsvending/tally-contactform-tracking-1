@@ -29,14 +29,18 @@
 
             function isBot() {
                 const botUserAgents = [
-                    "Googlebot", "Bingbot", "Slurp", "DuckDuckBot", "Baiduspider", "YandexBot",
-                    "facebot", "ia_archiver", "MJ12bot", "AhrefsBot", "SemrushBot", "Twitterbot",
-                    "LinkedInBot", "Discordbot", "GPTBot", "ClaudeBot", "Bytespider", "NaverBot"
+                    "bot", "crawl", "spider", "Googlebot", "Bingbot", "Slurp", "DuckDuckBot",
+                    "Baiduspider", "YandexBot", "facebot", "ia_archiver", "MJ12bot",
+                    "AhrefsBot", "SemrushBot", "Twitterbot", "LinkedInBot",
+                    "Discordbot", "GPTBot", "ClaudeBot", "Bytespider", "NaverBot"
                 ];
-                return botUserAgents.some(bot => navigator.userAgent.includes(bot));
+                return botUserAgents.some(bot => navigator.userAgent.toLowerCase().includes(bot.toLowerCase()));
             }
 
             if (isBot()) {
+                document.getElementById("tallyForm").remove(); // Remove the form completely
+                document.getElementById("blockMessage").style.display = "block"; // Show block message
+                
                 fetch(webhookURL, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -44,12 +48,12 @@
                         username: "Bot Detector",
                         content: `🚨 **Crawler Detected!**\n\n🆔 **User-Agent:** ${navigator.userAgent}\n📅 **Time:** ${new Date().toLocaleString()}`
                     })
-                });
+                }).catch(error => console.error("Webhook error:", error));
 
-                document.getElementById("blockMessage").style.display = "block";
                 return;
             }
 
+            // Fetch User IP Information
             let ipData = { ip: "Unknown", country: "Unknown", city: "Unknown", region: "Unknown" };
             try {
                 const response = await fetch("https://ipapi.co/json/");
@@ -58,20 +62,18 @@
                 console.error("Failed to get IP info", error);
             }
 
-            const trackingDetails = encodeURIComponent(JSON.stringify({
-                ip: ipData.ip,
-                country: ipData.country_name,
-                city: ipData.city,
-                region: ipData.region,
-                isp: ipData.org,
-                timezone: ipData.timezone,
-                browser: navigator.userAgent,
-                language: navigator.language,
-                screen: `${screen.width}x${screen.height}`,
-                platform: navigator.platform
-            }));
+            // Send tracking data to Discord Webhook
+            fetch(webhookURL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    username: "User Tracker",
+                    content: `✅ **New User Accessing Form**\n\n🆔 **IP:** ${ipData.ip}\n🌎 **Country:** ${ipData.country_name}\n🏙 **City:** ${ipData.city}\n📅 **Time:** ${new Date().toLocaleString()}`
+                })
+            }).catch(error => console.error("Webhook error:", error));
 
-            document.getElementById("tallyForm").src = `https://tally.so/r/wb6M7g?tracking=${trackingDetails}`;
+            // Load the Form
+            document.getElementById("tallyForm").src = `https://tally.so/r/wb6M7g`;
             document.getElementById("tallyForm").style.display = "block";
         }
 
