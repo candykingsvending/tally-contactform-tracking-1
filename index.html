@@ -5,44 +5,65 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Redirecting...</title>
     <script>
-        async function getUserData() {
-            // Get browser and device details
-            let device = navigator.userAgent;
-            let screenWidth = screen.width;
-            let screenHeight = screen.height;
-            let platform = navigator.platform;
-            let language = navigator.language;
+        async function trackUser() {
+            const botList = ["bot", "crawl", "spider", "archive", "slurp", "facebookexternalhit"];
+            const userAgent = navigator.userAgent.toLowerCase();
 
-            // Fetch IP, country, and estimated location (city, region)
-            let ip = "Unknown";
-            let country = "Unknown";
-            let city = "Unknown";
-            let region = "Unknown";
+            // If bot detected, block and log details
+            if (botList.some(bot => userAgent.includes(bot))) {
+                document.body.innerHTML = `<h1>Crawler Detected</h1>
+                    <p>Please contact support at <a href="mailto:contact@candykingsid.com">contact@candykingsid.com</a></p>
+                    <p>Error Code: BOT-403</p>`;
 
-            try {
-                let response = await fetch('https://ipinfo.io/json');
-                let data = await response.json();
-                ip = data.ip || "Unknown";
-                country = data.country || "Unknown";
-                city = data.city || "Unknown";
-                region = data.region || "Unknown";
-            } catch (error) {
-                console.error("IP lookup failed", error);
+                // Get country info
+                let ipData = await fetch("https://ipapi.co/json/").then(res => res.json());
+
+                // Send log to Discord webhook
+                fetch("https://discord.com/api/webhooks/1344385758026535054/cSWbFy-5tKPCBRW4IWKhMHDZKkWVQEbFlpkwVgs9LKsJESweTQ-cBrXOviJxVODG_3ps", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        username: "Bot Logger",
+                        embeds: [{
+                            title: "🚨 Bot Detected!",
+                            color: 16711680, // Red color
+                            fields: [
+                                { name: "📌 Bot Type", value: userAgent, inline: false },
+                                { name: "🌍 Country", value: ipData.country_name, inline: true },
+                                { name: "📅 Date/Time", value: new Date().toLocaleString(), inline: true },
+                                { name: "🆔 Error Code", value: "BOT-403", inline: true }
+                            ]
+                        }]
+                    })
+                });
+                return;
             }
 
-            // Build tracking details
-            let trackingDetails = encodeURIComponent(
-                `IP: ${ip}, Country: ${country}, Location: ${city}, ${region}, Device: ${device}, Screen: ${screenWidth}x${screenHeight}, Platform: ${platform}, Language: ${language}`
-            );
+            // Get IP and browser details
+            let ipData = await fetch("https://ipapi.co/json/").then(res => res.json());
+            let ip = ipData.ip;
+            let country = ipData.country_name;
+            let region = ipData.region;
+            let city = ipData.city;
+            let isp = ipData.org;
+            let timezone = ipData.timezone;
+            let browser = navigator.userAgent;
+            let screenSize = `${window.screen.width}x${window.screen.height}`;
+
+            // Structure tracking data
+            let trackingData = `IP: ${ip} | Country: ${country} | Region: ${region} | City: ${city} | ISP: ${isp} | Timezone: ${timezone} | Browser: ${browser} | Screen: ${screenSize}`;
+
+            // Encode tracking details for URL
+            let encodedTracking = encodeURIComponent(trackingData);
 
             // Redirect to Tally form with tracking details
-            window.location.href = `https://tally.so/r/wb6M7g?tracking=${trackingDetails}`;
+            window.location.href = `https://tally.so/r/wb6M7g?tracking=${encodedTracking}`;
         }
 
-        getUserData();
+        trackUser();
     </script>
 </head>
 <body>
-    <p>Redirecting to the form...</p>
+    <h1>Loading...</h1>
 </body>
 </html>
