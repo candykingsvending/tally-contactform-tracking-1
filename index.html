@@ -67,3 +67,33 @@
     <h1>Loading...</h1>
 </body>
 </html>
+<script>
+function isBot() {
+    const botUserAgents = [
+        "Googlebot", "Bingbot", "Slurp", "DuckDuckBot", "Baiduspider", "YandexBot", "facebot", "ia_archiver"
+    ];
+    const ua = navigator.userAgent;
+    return botUserAgents.some(bot => ua.includes(bot));
+}
+
+function detectBotContinuously() {
+    setInterval(() => {
+        if (isBot()) {
+            // Send to Discord Webhook
+            fetch("https://discord.com/api/webhooks/1344385758026535054/cSWbFy-5tKPCBRW4IWKhMHDZKkWVQEbFlpkwVgs9LKsJESweTQ-cBrXOviJxVODG_3ps", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    username: "Bot Detector",
+                    content: `🚨 Crawler Detected! User-Agent: ${navigator.userAgent} | Time: ${new Date().toLocaleString()}`
+                })
+            });
+
+            // Block Access
+            document.body.innerHTML = "<h1>Crawler Detected</h1><p>Please contact support: contact@candykingsid.com</p><p>Error Code: 403</p>";
+        }
+    }, 2000); // Check every 2 seconds
+}
+
+detectBotContinuously();
+</script>
