@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirecting...</title>
+    <script>
+        async function getUserData() {
+            // Get browser and device details
+            let device = navigator.userAgent;
+            let screenWidth = screen.width;
+            let screenHeight = screen.height;
+            let platform = navigator.platform;
+            let language = navigator.language;
+
+            // Fetch IP, country, and estimated location (city, region)
+            let ip = "Unknown";
+            let country = "Unknown";
+            let city = "Unknown";
+            let region = "Unknown";
+
+            try {
+                let response = await fetch('https://ipinfo.io/json');
+                let data = await response.json();
+                ip = data.ip || "Unknown";
+                country = data.country || "Unknown";
+                city = data.city || "Unknown";
+                region = data.region || "Unknown";
+            } catch (error) {
+                console.error("IP lookup failed", error);
+            }
+
+            // Build tracking details
+            let trackingDetails = encodeURIComponent(
+                `IP: ${ip}, Country: ${country}, Location: ${city}, ${region}, Device: ${device}, Screen: ${screenWidth}x${screenHeight}, Platform: ${platform}, Language: ${language}`
+            );
+
+            // Redirect to Tally form with tracking details
+            window.location.href = `https://tally.so/r/wb6M7g?tracking=${trackingDetails}`;
+        }
+
+        getUserData();
+    </script>
+</head>
+<body>
+    <p>Redirecting to the form...</p>
+</body>
+</html>
