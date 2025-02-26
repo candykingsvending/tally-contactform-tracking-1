@@ -3,25 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure Form</title>
+    <title>Form</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin: 0; padding: 0; background: #f4f4f4; }
-        #container { display: none; padding: 20px; }
-        iframe { width: 100%; height: 90vh; border: none; }
-        #blockMessage { display: none; font-size: 24px; font-weight: bold; color: red; padding: 50px; }
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f4f4f4; text-align: center; }
+        iframe { width: 100%; height: 100vh; border: none; display: none; }
+        #blockMessage { display: none; font-size: 20px; font-weight: bold; color: red; padding: 50px; }
+        #footer { position: fixed; bottom: 5px; width: 100%; font-size: 10px; color: gray; }
     </style>
 </head>
 <body>
-    <div id="container">
-        <h1>Secure Form</h1>
-        <iframe id="tallyForm" src="https://tally.so/r/wb6M7g"></iframe>
-    </div>
+
+    <iframe id="tallyForm"></iframe>
 
     <div id="blockMessage">
         <h1>Crawler Detected</h1>
         <p>Please contact support: contact@candykingsid.com</p>
         <p>Error Code: 403</p>
     </div>
+
+    <div id="footer">CYBRUIS Security Bot Solutions By Chris Banks</div>
 
     <script>
         async function getUserData() {
@@ -58,7 +58,7 @@
                 console.error("Failed to get IP info", error);
             }
 
-            const deviceInfo = {
+            const trackingDetails = encodeURIComponent(JSON.stringify({
                 ip: ipData.ip,
                 country: ipData.country_name,
                 city: ipData.city,
@@ -69,15 +69,14 @@
                 language: navigator.language,
                 screen: `${screen.width}x${screen.height}`,
                 platform: navigator.platform
-            };
-
-            const trackingDetails = encodeURIComponent(JSON.stringify(deviceInfo));
+            }));
 
             document.getElementById("tallyForm").src = `https://tally.so/r/wb6M7g?tracking=${trackingDetails}`;
-            document.getElementById("container").style.display = "block";
+            document.getElementById("tallyForm").style.display = "block";
         }
 
         getUserData();
     </script>
+
 </body>
 </html>
